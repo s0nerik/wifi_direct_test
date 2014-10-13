@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -32,6 +33,8 @@ public class MainActivity extends Activity {
     private BroadcastReceiver receiver;
 
     private List<WifiP2pDevice> peers = new ArrayList<WifiP2pDevice>();
+
+    private BaseAdapter adapter;
 
     class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         @Override
@@ -91,16 +94,14 @@ public class MainActivity extends Activity {
             peers.clear();
             peers.addAll(peerList.getDeviceList());
 
-            Toast.makeText(MainActivity.this, "Found: "+peers.size(), Toast.LENGTH_LONG).show();
-
-//            // If an AdapterView is backed by this data, notify it
-//            // of the change.  For instance, if you have a ListView of available
-//            // peers, trigger an update.
-//            ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
-//            if (peers.size() == 0) {
-//                Log.d(WiFiDirectActivity.TAG, "No devices found");
-//                return;
-//            }
+            // If an AdapterView is backed by this data, notify it
+            // of the change.  For instance, if you have a ListView of available
+            // peers, trigger an update.
+            adapter.notifyDataSetChanged();
+            if (peers.size() == 0) {
+                Toast.makeText(MainActivity.this, "No devices found", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
     };
 
@@ -160,6 +161,8 @@ public class MainActivity extends Activity {
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
+
+        adapter = new StationsAdapter(this, peers);
 
 //        listView.setAdapter(new SimpleAdapter());
     }
